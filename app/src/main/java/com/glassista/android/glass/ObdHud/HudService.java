@@ -18,10 +18,7 @@ package com.glassista.android.glass.ObdHud;
 
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothSocket;
+import android.bluetooth.*;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -61,30 +58,6 @@ public class HudService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        // Set up bluetooth connection
-
-        //mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        if (mBluetoothAdapter == null) {
-            Log.v(TAG, "Device does not support Bluetooth");
-            return;
-        } else {
-            if (!mBluetoothAdapter.isEnabled()) {
-                Log.v(TAG, "Bluetooth supported but not enabled");
-            } else {
-                Log.v(TAG, "Bluetooth supported and enabled");
-                // discover new Bluetooth devices
-                discoverBluetoothDevices();
-
-                // find devices that have been paired
-                getBondedDevices();
-            }
-        }
-
     }
 
     @Override
@@ -112,6 +85,28 @@ public class HudService extends Service {
 
             mLiveCard.publish(LiveCard.PublishMode.REVEAL);
 
+            // Set up bluetooth connection
+
+            //mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            final BluetoothManager bluetoothManager =
+                    (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            mBluetoothAdapter = bluetoothManager.getAdapter();
+
+            if (mBluetoothAdapter == null) {
+                Log.v(TAG, "Device does not support Bluetooth");
+                return -1;
+            } else {
+                if (!mBluetoothAdapter.isEnabled()) {
+                    Log.v(TAG, "Bluetooth supported but not enabled");
+                } else {
+                    Log.v(TAG, "Bluetooth supported and enabled");
+                    // discover new Bluetooth devices
+                    discoverBluetoothDevices();
+
+                    // find devices that have been paired
+                    getBondedDevices();
+                }
+            }
 
         }
         return START_STICKY;
@@ -237,7 +232,6 @@ public class HudService extends Service {
 
                     String timestamp = new String(buffer, 0, bytesRead);
                     Log.v(TAG, "bt [" + timestamp + "]");
-
 
                     mRenderer.setObdData(timestamp, 4500, 80, 6);    // TODO: get real data here
 

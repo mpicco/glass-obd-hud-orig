@@ -96,7 +96,7 @@ public class HudRenderer implements DirectRenderingCallback {
         updateRenderingState();
     }
 
-    public void setObdData(String timestamp, int rpm, int speed, int gear) {
+    public synchronized void setObdData(String timestamp, int rpm, int speed, int gear) {
         mTimestamp = timestamp;
         mRpm = rpm;
         mSpeed = speed;

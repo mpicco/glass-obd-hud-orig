@@ -52,7 +52,7 @@ public class HudView extends View {
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         //mPaint.setTextSize(192);
         mPaint.setTextSize(32);
-        mPaint.setColor(0xf0f0f0);
+        //mPaint.setColor(Color.GRAY);
         mPaint.setStrokeWidth(2);
     }
 
@@ -64,7 +64,7 @@ public class HudView extends View {
      * @param speed Speed in MPH as measured by ECU
      * @param gear Valid only for F800ST: computed from speed/rpm using F800ST specs.
      */
-    public void setObdData(String timestamp, int rpm, int speed, int gear) {
+    public synchronized void setObdData(String timestamp, int rpm, int speed, int gear) {
         mTimestamp = timestamp;
         mRpm = rpm;
         mSpeed = speed;
