@@ -18,18 +18,25 @@ package com.glassista.android.glass.ObdHud;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
+import java.util.Date;
+
 /**
- * View used to draw the level line.
+ * View used to draw HUD
  */
 public class HudView extends View {
 
+    private static final String TAG = HudRenderer.class.getSimpleName();
+
     private Paint mPaint = new Paint();
-    private float mAngle = 0.f;
+    private int mSpeed = 0;
+    private int mRpm = 0;
+    private int mGear = 0;
+    private String mTimestamp;
 
     public HudView(Context context) {
         this(context, null, 0);
@@ -42,24 +49,41 @@ public class HudView extends View {
     public HudView(Context context, AttributeSet attrs, int style) {
         super(context, attrs, style);
 
-        mPaint.setColor(Color.BLUE);
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setStrokeWidth(5);
+        //mPaint.setTextSize(192);
+        mPaint.setTextSize(32);
+        mPaint.setColor(0xf0f0f0);
+        mPaint.setStrokeWidth(2);
     }
 
     /**
-     * Set the angle of the level line.
+     * Set the OBD data.
      *
-     * @param angle Angle of the level line.
+     * @param timestamp Timestamp of obd sample
+     * @param rpm RPM as measured by ECU
+     * @param speed Speed in MPH as measured by ECU
+     * @param gear Valid only for F800ST: computed from speed/rpm using F800ST specs.
      */
-    public void setAngle(float angle) {
-        mAngle = angle;
-        // Redraw the line.
+    public void setObdData(String timestamp, int rpm, int speed, int gear) {
+        mTimestamp = timestamp;
+        mRpm = rpm;
+        mSpeed = speed;
+        mGear = gear;
+
+        // Redraw the data.
         invalidate();
     }
 
-    public float getAngle() {
-        return mAngle;
+    public int getRpm() {
+        return mRpm;
+    }
+
+    public int getSpeed() {
+        return mSpeed;
+    }
+
+    public int getGear() {
+        return mGear;
     }
 
     @Override
@@ -68,11 +92,10 @@ public class HudView extends View {
         int width = canvas.getWidth();
         int height = canvas.getHeight() / 2;
 
-        // Compute the coordinates.
-        float y = (float) Math.tan(mAngle) * width / 2;
-
-        // Draw the level line.
-        canvas.drawLine(0, y + height, width, -y + height, mPaint);
+        String timestamp = (mTimestamp != null) ? mTimestamp : new Date().toString();
+        Log.v(TAG, "od [" + timestamp + "]");
+        //canvas.drawText(stringToDisplay , 290, 160, mPaint);
+        canvas.drawText(timestamp, 290, 10, mPaint);
     }
 
 }

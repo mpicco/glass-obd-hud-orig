@@ -16,12 +16,8 @@
 
 package com.glassista.android.glass.ObdHud;
 
-import android.content.Context;
+import android.content.*;
 import android.graphics.Canvas;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +25,11 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
+
 import com.google.android.glass.timeline.DirectRenderingCallback;
 
-import java.util.concurrent.TimeUnit;
 
 public class HudRenderer implements DirectRenderingCallback {
 
@@ -49,7 +47,6 @@ public class HudRenderer implements DirectRenderingCallback {
 
     private SurfaceHolder mHolder;
     private RenderThread mRenderThread;
-    private SensorManager mSensorManager;
     private int mSurfaceWidth;
     private int mSurfaceHeight;
     private boolean mRenderingPaused;
@@ -57,41 +54,21 @@ public class HudRenderer implements DirectRenderingCallback {
     private final FrameLayout mLayout;
     private final HudView mHudView;
 
-    private final SensorEventListener mSensorEventListener = new SensorEventListener() {
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // Nothing to do here.
-        }
+    private String mTimestamp;
+    private int mRpm;
+    private int mSpeed;
+    private int mGear;
 
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
-                computeOrientation(event);
-            }
-        }
-
-        /**
-         * Compute the orientation angle.
-         *
-         * @param event Gravity values.
-         */
-        private void computeOrientation(SensorEvent event) {
-            float angle = (float) -Math.atan(event.values[0]
-                    / Math.sqrt(event.values[1] * event.values[1] + event.values[2] * event.values[2]));
-
-            mHudView.setAngle(angle);
-        }
-    };
 
     /**
      * Creates a new instance of the {@code HudRenderer} .
      */
-    public HudRenderer(SensorManager sensorManager, Context context) {
+    public HudRenderer(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
         mLayout = (FrameLayout) inflater.inflate(R.layout.hud_live_card, null);
-        mHudView = (HudView) mLayout.findViewById(R.id.level);
-        mSensorManager = sensorManager;
+        mHudView = (HudView) mLayout.findViewById(R.id.hud);
+
     }
 
     @Override
@@ -119,6 +96,13 @@ public class HudRenderer implements DirectRenderingCallback {
         updateRenderingState();
     }
 
+    public void setObdData(String timestamp, int rpm, int speed, int gear) {
+        mTimestamp = timestamp;
+        mRpm = rpm;
+        mSpeed = speed;
+        mGear = gear;
+    }
+
     /**
      * Starts or stops rendering according to the {@link LiveCard}'s state.
      */
@@ -128,17 +112,13 @@ public class HudRenderer implements DirectRenderingCallback {
 
         if (shouldRender != isRendering) {
             if (shouldRender) {
-                mSensorManager.registerListener(mSensorEventListener,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
-                        SensorManager.SENSOR_DELAY_NORMAL);
-
+                Log.v(TAG, "shouldRender = TRUE");
                 mRenderThread = new RenderThread();
                 mRenderThread.start();
             } else {
+                Log.v(TAG, "shouldRender = FALSE");
                 mRenderThread.quit();
                 mRenderThread = null;
-
-                mSensorManager.unregisterListener(mSensorEventListener);
             }
         }
     }
@@ -175,6 +155,7 @@ public class HudRenderer implements DirectRenderingCallback {
         if (canvas != null) {
 
             doLayout();
+            Log.v(TAG, "Draw...");
             mLayout.draw(canvas);
 
             try {
@@ -216,6 +197,7 @@ public class HudRenderer implements DirectRenderingCallback {
 
         @Override
         public void run() {
+            Log.v(TAG, "render thread started");
             while (shouldRun()) {
                 long frameStart = SystemClock.elapsedRealtime();
                 repaint();

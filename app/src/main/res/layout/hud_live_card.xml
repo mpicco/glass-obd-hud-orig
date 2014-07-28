@@ -20,9 +20,10 @@
     android:keepScreenOn="true">
 
     <com.glassista.android.glass.ObdHud.HudView
-        android:id="@+id/level"
+        android:id="@+id/hud"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         />
+
 </FrameLayout>

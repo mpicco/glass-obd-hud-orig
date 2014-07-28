@@ -22,13 +22,18 @@ import android.os.Bundle;
 
 /**
  * Having an activity that starts the service allows one to attach with the
- * interactive debugger more predictably
+ * interactive debugger more predictably.
+ * Also, it gives us a place to set up Bluetooth connection
  */
 public class StartHudActivity extends Activity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startService(new Intent(this, HudService.class));
+
         finish();
     }
+
+
 }
