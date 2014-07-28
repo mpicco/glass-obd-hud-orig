@@ -18,9 +18,9 @@ package com.glassista.android.glass.ObdHud;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.util.Date;
@@ -52,7 +52,7 @@ public class HudView extends View {
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         //mPaint.setTextSize(192);
         mPaint.setTextSize(32);
-        //mPaint.setColor(Color.GRAY);
+        mPaint.setColor(Color.GRAY);
         mPaint.setStrokeWidth(2);
     }
 
@@ -93,9 +93,9 @@ public class HudView extends View {
         int height = canvas.getHeight() / 2;
 
         String timestamp = (mTimestamp != null) ? mTimestamp : new Date().toString();
-        Log.v(TAG, "od [" + timestamp + "]");
-        //canvas.drawText(stringToDisplay , 290, 160, mPaint);
-        canvas.drawText(timestamp, 290, 10, mPaint);
+        //Log.v(TAG, "od [" + timestamp + "]");
+        //canvas.drawText(t , 290, 160, mPaint);
+        canvas.drawText(timestamp, 10, 160, mPaint);
     }
 
 }

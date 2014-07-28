@@ -155,7 +155,6 @@ public class HudRenderer implements DirectRenderingCallback {
         if (canvas != null) {
 
             doLayout();
-            Log.v(TAG, "Draw...");
             mLayout.draw(canvas);
 
             try {
